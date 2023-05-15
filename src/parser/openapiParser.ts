@@ -1,7 +1,7 @@
 import openapiSpecification from "@/assets/openapiSpecification";
 import {sentenceCase} from "sentence-case";
 
-const idPattern = `([A-Za-z]*[iI]d)`
+export const idPattern = `([A-Za-z]*[iI]d)`
 const paths = Object.keys(openapiSpecification.paths);
 const commonPrefix = paths.reduce((prefix, path) => {
     const i = path.indexOf(prefix);
@@ -49,6 +49,10 @@ const controllerEndpoints = controllers.map(controller => {
 
 type SortObjectType = { key: string, order: 'asc' | 'desc' | undefined };
 
+
+type EnumKeys<T> = {
+    [K in keyof T]: T[K] extends { enum: any[] } ? K : never
+}[keyof T];
 const globalOnlyConfig = () => {
     const g_config = {
         baseUrl: '',
@@ -59,7 +63,7 @@ const globalOnlyConfig = () => {
             onLogout: () => undefined,
         },
         enumMapping: {},
-        defineEnumNames: (enumName: keyof typeof openapiSpecification.components.schemas, namesMap: {
+        defineEnumNames: (enumName: EnumKeys<typeof openapiSpecification.components.schemas>, namesMap: {
             [key: string | number]: string
         }) => {
             const model = openapiSpecification.components.schemas[enumName];

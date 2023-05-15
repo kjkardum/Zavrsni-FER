@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {ControllerEndpointType} from "@/parser/openapiParser";
+import ControllerDataTable from "@/components/DataTable/ControllerDataTable.vue";
 
 defineProps<{
     controllerMetadata: ControllerEndpointType
@@ -8,7 +9,7 @@ defineProps<{
 </script>
 <template>
     <div>
-        <h1>Controller {{ controllerMetadata.name }}</h1>
+        <controller-data-table :controller="controllerMetadata" />
         <h2>Metadata:</h2>
         <pre>{{ controllerMetadata }}</pre>
     </div>

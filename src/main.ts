@@ -35,6 +35,8 @@ config.globals.pagination.paginationResponse = (data) => ({
     data: data.items,
 });
 
+config.controllers.Users.pagination.source = 'client';
+
 config.globals.defineEnumNames("ArticleType", {
     1: "Physical good",
     2: "Digital good",

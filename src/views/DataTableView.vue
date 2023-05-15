@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import ControllerDataTable from "@/components/ControllerDataTable.vue";
+import ControllerDataTable from "@/components/DataTable/ControllerDataTable.vue";
 import type {ControllerEndpointType} from "@/parser/openapiParser";
 import controllerEndpoints from "@/parser/openapiParser";
 

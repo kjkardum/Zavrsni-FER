@@ -4,7 +4,8 @@ export {}
 
 declare module '@vue/runtime-core' {
     export interface GlobalComponents {
-        VDataTable: typeof import('vuetify/labs/VDataTable')['VDataTableServer']
+        VDataTableServer: typeof import('vuetify/labs/VDataTable')['VDataTableServer'],
+        VDataTable: typeof import('vuetify/components/VDataTable')['VDataTable']
         // other lab components here
     }
 }

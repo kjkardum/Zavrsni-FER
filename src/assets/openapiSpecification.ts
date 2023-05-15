@@ -1303,6 +1303,9 @@ export default {
         },
         "additionalProperties": false
       },
+      "OtherType": {
+        "enum": []
+      },
       "ArticleType": {
         "enum": [
           1,
