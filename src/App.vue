@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import {RouterView} from 'vue-router'
+import {RouterView, useRoute} from 'vue-router'
+
+const route = useRoute();
 </script>
 
 <template>
@@ -32,7 +34,8 @@ import {RouterView} from 'vue-router'
 
             <v-list>
                 <v-list-item
-                        v-for="[icon, text, link] in links"
+                        v-for="[icon, text, link, controllerName] in links"
+                        :active="route.path.includes(controllerName)"
                         :key="icon"
                         :to="link"
                         link
@@ -52,7 +55,8 @@ import {RouterView} from 'vue-router'
                     fluid
             >
                 <RouterView/>
-                <v-row>
+
+<!--              <v-row>
                     <v-col
                             v-for="card in cards"
                             :key="card"
@@ -85,7 +89,8 @@ import {RouterView} from 'vue-router'
                             </v-list>
                         </v-card>
                     </v-col>
-                </v-row>
+                </v-row>-->
+
             </v-container>
         </v-main>
     </v-app>
@@ -99,12 +104,12 @@ export default {
         cards: ['Today', 'Yesterday'],
         drawer: null,
         links: [
-            ['mdi-home', 'Home', '/'],
-            ['mdi-list-box', 'Dummy table', '/dummyTable'],
+            ['mdi-home', 'Home', '/', '-'],
+            ['mdi-list-box', 'Dummy table', '/dummyTable', '-'],
             ...controllerEndpoints.map(controller =>
-                ['mdi-list-box', controller.titleCaseName, `/controller/${controller.name}`]
+                ['mdi-list-box', controller.titleCaseName, `/controller/${controller.name}`, controller.name]
             ),
-            ['mdi-information', 'About', '/about'],
+            ['mdi-information', 'About', '/about', '-'],
         ],
     }),
 }

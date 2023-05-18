@@ -9,6 +9,7 @@ import {getSpecificationModelChildren} from "@/parser/util/specificationModelChi
 import {createProxyPath} from "@/parser/util/proxyPathFollower";
 import {loadControllerConfig} from "@/parser/util/overrideableConfigGetter";
 import ControllerTableHeader from "@/components/DataTable/ControllerTableHeader.vue";
+import {currentRouter} from "@/parser/openapiRouter";
 
 const props = defineProps<{
     controller: ControllerEndpointType
@@ -106,7 +107,13 @@ const loadServerData = async ({page, itemsPerPage, sortBy}: { page: number, item
     loading.value = false;
 };
 const editItem = (item: any) => {
-    console.log('edit', item);
+  currentRouter.router?.push({
+    name: props.controller.name + '-edit',
+    params: {
+      id: item.id
+    }
+  });
+
 }
 
 const dialogDelete = ref(false);
@@ -189,9 +196,12 @@ watch(fields, async () => {
                 class="elevation-1"
                 @update:options="loadServerData"
         >
+          <template v-slot:top>
+            <ControllerTableHeader :controller="props.controller" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
+          </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon small class="mr-2" @click="editItem(item)" v-if="props.controller.put">mdi-pencil</v-icon>
-                <v-icon small @click="deleteItem(item)" v-if="props.controller.delete">mdi-delete</v-icon>
+                <v-icon small class="mr-2" @click="editItem(item.raw)" v-if="props.controller.put">mdi-pencil</v-icon>
+                <v-icon small @click="deleteItem(item.raw)" v-if="props.controller.delete">mdi-delete</v-icon>
             </template>
         </v-data-table-server>
     </v-card>
