@@ -48,10 +48,16 @@ const init_data = async () => {
             const newItem = {};
             for (const key in item) {
                 const field = fields.value.find(field => field.name === key);
+                const lowerName = field.name.toLowerCase();
+                const controllersForFields = Object.keys(config.controllers[props.controller.name].controllersForValues);
+                const controllerForFieldKey = controllersForFields.find(controller => lowerName.includes(controller.toLowerCase()));
+                const {name: controllerForField} = config.controllers[props.controller.name].controllersForValues[controllerForFieldKey ?? '__'] ?? {};
                 if (field["ref"] && config.globals.enumMapping[field["ref"]]) {
                     newItem[key] = config.globals.enumMapping[field["ref"]][item[key]];
                 } else {
-                    newItem[key] = typeof item[key] === 'object' ? JSON.stringify(item[key]) : item[key].toString();
+                    newItem[key] = typeof item[key] === 'object'
+                        ? (controllerForField && item[key] ? config.controllers[controllerForField].representation(item[key]) : JSON.stringify(item[key]))
+                        : item[key].toString();
                 }
             }
             return newItem;
