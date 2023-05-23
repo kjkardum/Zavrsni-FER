@@ -114,6 +114,21 @@ const getRelatedEntityValues = (field) => {
 
 const endIntersectField = (field) => () => getRelatedEntityValues(field);
 
+watch(props.editId, (newVal) => {
+  if (props.editId) {
+    console.log("fetching", props.editId);
+    fetch(config.globals.baseUrl + props.controller.getById.replace(new RegExp(`\\{${idPattern}\\}`), String(props.editId)), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    }).then(res => res.json()).then(data => {
+      fieldValues.value = data;
+      //load related for necessary
+    })
+  }
+}, {immediate: true});
+
 watch(fieldValues, (newVal) => {
   props.updateFeilds(newVal);
 }, {deep: true})
@@ -147,7 +162,7 @@ watch(fieldValues, (newVal) => {
                 v-intersect="endIntersectField(field)" />
           </template></v-select>
         <v-select
-          v-if="field.value !== undefined"
+          v-if="field.value !== undefined && (typeof field.value[0] === 'string' || typeof field.value[0] === 'number')"
           :label="sentenceCase(field.name)"
           :items="getEnumValues(field)"
           item-value="key"

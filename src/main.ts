@@ -37,6 +37,7 @@ config.globals.pagination.paginationResponse = (data) => ({
 
 config.controllers.Users.pagination.source = 'client';
 config.controllers.Articles.controllersForValues['category'] = {name: 'StringMaps', filter: (map) => map.stringMapType === 'article.category'};
+config.controllers.Users.controllersForValues['role'] = {name: 'StringMaps', filter: (map) => map.stringMapType === 'user.role'};
 config.controllers.StringMaps.representation = (item: any) => item.value;
 config.controllers.Users.representation = (item: any) => {
     return `${item.firstName} ${item.lastName}`;
