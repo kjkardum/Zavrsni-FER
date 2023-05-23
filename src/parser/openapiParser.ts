@@ -119,6 +119,9 @@ type ControllerConfigType = ReturnType<typeof controllerOnlyConfig> & ReturnType
 const controllerConfig: {[key: string]: ControllerConfigType} = {};
 for (const controller of controllerEndpoints) {
     controllerConfig[controller.name] = {...globalOverrideableConfig(true), ...controllerOnlyConfig()}
+    controller.relatedEntities.forEach(relatedController => {
+        controllerConfig[`${controller.name}/${relatedController.name}`] = {...globalOverrideableConfig(true), ...controllerOnlyConfig()}
+    })
 }
 export const config = {
     globals: {...globalOnlyConfig(), ...globalOverrideableConfig()},

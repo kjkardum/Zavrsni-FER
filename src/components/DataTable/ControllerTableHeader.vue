@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import type {ControllerEndpointType} from "@/parser/openapiParser";
 import type {Ref} from "vue";
-import {ref, toRef, watch} from "vue";
+import {computed, ref, toRef, watch} from "vue";
 import {tr} from "vuetify/locale";
 import {currentRouter} from "@/parser/openapiRouter";
+import {sentenceCase} from "sentence-case";
 
 const props = defineProps<{
-    controller: ControllerEndpointType
+    controllerName: string,
+    controllerPath: string,
     dialogDelete: boolean
-    setDialogDelete: (value: boolean, toDelete?: boolean) => void
+    setDialogDelete: (value: boolean, toDelete?: boolean) => void,
+    parentId: string,
 }>();
 const dialogDelete = toRef(props, 'dialogDelete');
 watch(dialogDelete, (value) => {
@@ -18,17 +21,20 @@ const closeDialogDelete = () => props.setDialogDelete(false);
 const closeDialogAndDelete = () => props.setDialogDelete(false, true)
 const newItem = () => {
   currentRouter.router?.push({
-    name: props.controller.name + '-new',
+    name:  props.controllerName + '-new',
+    params: {
+      parentId: props.parentId
+    }
   });
-
 }
+const printableControllerName = computed(() => sentenceCase(props.controllerName.replace('/', ' ')))
 </script>
 
 <template>
     <v-toolbar
             flat
     >
-        <v-toolbar-title>Controller {{ props.controller.name }}</v-toolbar-title>
+        <v-toolbar-title>{{ printableControllerName }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
             color="blue darken-1"

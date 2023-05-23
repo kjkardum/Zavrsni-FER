@@ -12,11 +12,16 @@ import ControllerTableHeader from "@/components/DataTable/ControllerTableHeader.
 import {currentRouter} from "@/parser/openapiRouter";
 
 const props = defineProps<{
-    controller: ControllerEndpointType
+    controller: ControllerEndpointType,
+    controllerPrefix: string,
+    parentId?: string
 }>();
 
+const controllerName = computed(() => props.controllerPrefix + props.controller.name);
+const controllerGet = computed(() => props.parentId ? props.controller.get.replace(new RegExp(`\\{${idPattern}\\}`), String(props.parentId)) : props.controller.get);
+const controllerDelete = computed(() => props.parentId ? props.controller.delete.replace(new RegExp(`\\{${idPattern}\\}`), String(props.parentId)) : props.controller.delete);
 
-const configGetter = computed(() => loadControllerConfig(props.controller.name));
+const configGetter = computed(() => loadControllerConfig(controllerName.value));
 const useClientPagination = computed(() => configGetter.value(t => t.pagination.source) === 'client');
 const itemsPerPageOptions = computed(() => configGetter.value(t => t.pagination.pageSizeOptions).map((value: number) => ({
     title: String(value),
@@ -33,7 +38,7 @@ const init_data = async () => {
     if (useClientPagination.value) {
         loading.value = true;
         const res = await fetch(
-            config.globals.baseUrl + props.controller.get,
+            config.globals.baseUrl + controllerGet.value,
             {
                 method: 'GET',
                 headers: {
@@ -42,16 +47,16 @@ const init_data = async () => {
                 },
             });
         const data = await res.json();
-        let mappedData = config.controllers[props.controller.name].pagination.paginationResponse(data)?.data ?? data;
+        let mappedData = config.controllers[controllerName.value].pagination.paginationResponse(data)?.data ?? data;
         if (!mappedData) throw new Error('Pagination response not found');
         mappedData = mappedData.map(item => {
             const newItem = {};
             for (const key in item) {
                 const field = fields.value.find(field => field.name === key);
                 const lowerName = field.name.toLowerCase();
-                const controllersForFields = Object.keys(config.controllers[props.controller.name].controllersForValues);
+                const controllersForFields = Object.keys(config.controllers[controllerName.value].controllersForValues);
                 const controllerForFieldKey = controllersForFields.find(controller => lowerName.includes(controller.toLowerCase()));
-                const {name: controllerForField} = config.controllers[props.controller.name].controllersForValues[controllerForFieldKey ?? '__'] ?? {};
+                const {name: controllerForField} = config.controllers[controllerName.value].controllersForValues[controllerForFieldKey ?? '__'] ?? {};
                 if (field["ref"] && config.globals.enumMapping[field["ref"]]) {
                     newItem[key] = config.globals.enumMapping[field["ref"]][item[key]];
                 } else {
@@ -73,7 +78,7 @@ const loadServerData = async ({page, itemsPerPage, sortBy}: { page: number, item
     const actualPage = page - 1 + firstPage.value;
     loading.value = true;
     const res = await fetch(
-        config.globals.baseUrl + props.controller.get + '?' + new URLSearchParams(
+        config.globals.baseUrl + controllerGet.value + '?' + new URLSearchParams(
             configGetter.value(t => t.pagination.paginationQueryParams(actualPage, itemsPerPage, '', sortBy))
         ),
         {
@@ -84,7 +89,7 @@ const loadServerData = async ({page, itemsPerPage, sortBy}: { page: number, item
             },
         });
     const data = await res.json();
-    const mappedData = config.controllers[props.controller.name].pagination.paginationResponse(data) ??
+    const mappedData = config.controllers[controllerName.value].pagination.paginationResponse(data) ??
         config.globals.pagination.paginationResponse(data);
     if (!mappedData) throw new Error('Pagination response not found');
     console.log(mappedData)
@@ -107,14 +112,14 @@ const loadServerData = async ({page, itemsPerPage, sortBy}: { page: number, item
     const filteredKeys = keys.filter(key => !(
         (key.toLowerCase().endsWith('id') && (
                 keys.includes(key.slice(0, -2))
-                || key.length !== 2 && !key.toLowerCase().includes(props.controller.name.toLowerCase()))
+                || key.length !== 2 && !key.toLowerCase().includes(controllerName.value.toLowerCase()))
         ) || typeof mappedData?.data[0][key] === 'object'))
     //TODO: originally set headers here based on filteredKeys
     loading.value = false;
 };
 const editItem = (item: any) => {
   currentRouter.router?.push({
-    name: props.controller.name + '-edit',
+    name: controllerName.value + '-edit',
     params: {
       id: item.id
     }
@@ -134,7 +139,7 @@ const setDialogDelete = (value: boolean, toDelete = false) => {
     if (toDelete && dialogDeleteItem.value) {
         loading.value = true;
         fetch(
-            config.globals.baseUrl + props.controller.delete.replace(new RegExp(`\\{${idPattern}\\}`), dialogDeleteItem.value.id),
+            config.globals.baseUrl + controllerDelete.value.replace(new RegExp(`\\{${idPattern}\\}`), dialogDeleteItem.value.id),
             {
                 method: 'DELETE',
                 headers: {
@@ -203,7 +208,7 @@ watch(fields, async () => {
                 @update:options="loadServerData"
         >
           <template v-slot:top>
-            <ControllerTableHeader :controller="props.controller" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
+            <ControllerTableHeader :controllerName="controllerName" :parent-id="parentId" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
           </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon small class="mr-2" @click="editItem(item.raw)" v-if="props.controller.put">mdi-pencil</v-icon>
@@ -221,7 +226,7 @@ watch(fields, async () => {
                 class="elevation-1"
         >
             <template v-slot:top>
-                <ControllerTableHeader :controller="props.controller" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
+                <ControllerTableHeader :controllerName="controllerName" :parent-id="parentId" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon small class="mr-2" @click="editItem(item.raw)" v-if="props.controller.put">mdi-pencil</v-icon>

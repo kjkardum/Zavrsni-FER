@@ -12,9 +12,11 @@ const props = defineProps<{
   controller: ControllerEndpointType,
   editId?: any,
   updateFeilds: (fields: any) => void,
+  controllerPrefix: string,
+  parentId?: string
 }>();
-
-const configGetter = computed(() => loadControllerConfig(props.controller.name));
+const controllerName = computed(() => props.controllerPrefix + props.controller.name);
+const configGetter = computed(() => loadControllerConfig(controllerName.value));
 const responseSchema = computed(() => openapiSpecification.paths[props.controller[props.editId ? 'put' : 'post'] as any][props.editId ? 'put' : 'post'].requestBody.content["application/json"].schema);
 const fieldValues = ref({});
 const fields = computed(() => {
@@ -46,10 +48,10 @@ const loadedPage = ref({} as { [key: string]: number });
 const relatedValueFilters = ref({} as { [key: string]: any });
 const getRelatedEntityValues = (field) => {
   const lowerName = field.name.toLowerCase();
-  const controllersForFields = Object.keys(config.controllers[props.controller.name].controllersForValues);
+  const controllersForFields = Object.keys(config.controllers[controllerName.value].controllersForValues);
   const controllerForFieldKey = controllersForFields.find(controller => lowerName.includes(controller.toLowerCase()));
   if (!controllerForFieldKey) return [];
-  const {name: controllerForField, filter: controllerForFieldFilter} = config.controllers[props.controller.name].controllersForValues[controllerForFieldKey];
+  const {name: controllerForField, filter: controllerForFieldFilter} = config.controllers[controllerName.value].controllersForValues[controllerForFieldKey];
   relatedValueFilters.value[field.name] = controllerForFieldFilter ?? ((x) => x);
   const controllerMetadata = controllerEndpoints.find(controller => controller.name === controllerForField);
   const controllerConfigGetter = loadControllerConfig(controllerForField);
@@ -114,7 +116,7 @@ const getRelatedEntityValues = (field) => {
 
 const endIntersectField = (field) => () => getRelatedEntityValues(field);
 
-watch(props.editId, (newVal) => {
+watch(() => [props.editId, props.parentId], () => {
   if (props.editId) {
     console.log("fetching", props.editId);
     fetch(config.globals.baseUrl + props.controller.getById.replace(new RegExp(`\\{${idPattern}\\}`), String(props.editId)), {
@@ -127,7 +129,10 @@ watch(props.editId, (newVal) => {
       //load related for necessary
     })
   }
-}, {immediate: true});
+  else {
+    fieldValues.value = {};
+  }
+}, {immediate: true})
 
 watch(fieldValues, (newVal) => {
   props.updateFeilds(newVal);

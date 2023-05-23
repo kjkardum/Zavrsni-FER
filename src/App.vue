@@ -105,7 +105,6 @@ export default {
         drawer: null,
         links: [
             ['mdi-home', 'Home', '/', '-'],
-            ['mdi-list-box', 'Dummy table', '/dummyTable', '-'],
             ...controllerEndpoints.map(controller =>
                 ['mdi-list-box', controller.titleCaseName, `/controller/${controller.name}`, controller.name]
             ),

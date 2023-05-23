@@ -44,13 +44,37 @@ const createOpenapiRouter = () => {
                     props: {
                         controller: controller
                     }
-                }
+                },
+                ...controller.relatedEntities.map(relatedEntity => ([
+                    {
+                        path: '/controller/' + controller.name + '/related/:parentId/' + relatedEntity.name,
+                        name: `${controller.name}/${relatedEntity.name}`,
+                        component: () => import('../views/ControllerView.vue'),
+                        props: {
+                            controllerMetadata: relatedEntity,
+                            parentController: controller,
+                        }
+                    },
+                    {
+                        path: '/controller/' + controller.name + '/related/:parentId/' + relatedEntity.name + '/edit/:id',
+                        name: `${controller.name}/${relatedEntity.name}` + '-edit',
+                        component: () => import('../views/ControllerEditView.vue'),
+                        props: {
+                            controller: relatedEntity,
+                            parentController: controller,
+                        }
+                    },
+                    {
+                        path: '/controller/' + controller.name + '/related/:parentId/' + relatedEntity.name + '/new',
+                        name: `${controller.name}/${relatedEntity.name}` + '-new',
+                        component: () => import('../views/ControllerEditView.vue'),
+                        props: {
+                            controller: relatedEntity,
+                            parentController: controller,
+                        }
+                    },
+                ])).flat()
             ] as RouteRecordRaw[])).flat(),
-            {
-                path: '/dummyTable',
-                name: 'dummyTable',
-                component: () => import('../views/DataTableViewDummy.vue')
-            },
             {
                 path: '/:pathMatch(.*)*',
                 name: 'not-found',
@@ -58,6 +82,7 @@ const createOpenapiRouter = () => {
             }
         ]
     });
+    console.log(currentRouter.router.getRoutes());
     return currentRouter.router;
 };
 

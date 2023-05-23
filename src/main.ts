@@ -22,6 +22,12 @@ const app = createApp(App)
 
 config.globals.baseUrl = 'https://localhost:7009';
 config.globals.pagination.firstPageNumber = 1;
+config.globals.authentication = {
+    authType: 'Bearer',
+    loginRoute: '/api/Account/login',
+    loginResponseToken: (apiResponse: any): string => apiResponse.token,
+    onLogout: () => undefined,
+}
 config.globals.pagination.paginationQueryParams = (page: number, pageSize: number, filter: string, sort: any) => ({
     pageNumber: page,
     pageSize: pageSize,
@@ -36,6 +42,7 @@ config.globals.pagination.paginationResponse = (data) => ({
 });
 
 config.controllers.Users.pagination.source = 'client';
+config.controllers['Articles/images'].pagination.source = 'client';
 config.controllers.Articles.controllersForValues['category'] = {name: 'StringMaps', filter: (map) => map.stringMapType === 'article.category'};
 config.controllers.Users.controllersForValues['role'] = {name: 'StringMaps', filter: (map) => map.stringMapType === 'user.role'};
 config.controllers.Users.controllersForValues['organization'] = {name: 'StringMaps', filter: (map) => map.stringMapType === 'user.organization'};
@@ -55,7 +62,6 @@ config.globals.defineEnumNames("ArticleType", new Map([
 ]));
 
 console.log(controllerEndpoints);
-
 console.log(config);
 
 const router = createOpenapiRouter();
