@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import type {Router} from "vue-router";
+import type {Router, RouteRecordRaw} from "vue-router";
 import controllerEndpoints from "@/parser/openapiParser";
 
 export const currentRouter: {router: Router} = {router: undefined};
@@ -30,7 +30,7 @@ const createOpenapiRouter = () => {
                     }
                 },
                 {
-                    path: '/controller/' + controller.name + '/:id',
+                    path: '/controller/' + controller.name + '/edit/:id',
                     name: controller.name + '-edit',
                     component: () => import('../views/ControllerEditView.vue'),
                     props: {
@@ -45,7 +45,7 @@ const createOpenapiRouter = () => {
                         controller: controller
                     }
                 }
-            ])).flat(),
+            ] as RouteRecordRaw[])).flat(),
             {
                 path: '/dummyTable',
                 name: 'dummyTable',

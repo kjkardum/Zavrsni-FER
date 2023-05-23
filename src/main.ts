@@ -36,13 +36,21 @@ config.globals.pagination.paginationResponse = (data) => ({
 });
 
 config.controllers.Users.pagination.source = 'client';
+config.controllers.Articles.controllersForValues['category'] = {name: 'StringMaps', filter: (map) => map.stringMapType === 'article.category'};
+config.controllers.StringMaps.representation = (item: any) => item.value;
+config.controllers.Users.representation = (item: any) => {
+    return `${item.firstName} ${item.lastName}`;
+};
+config.controllers.Articles.representation = (item: any) => {
+    return `${item.title}`;
+}
 
-config.globals.defineEnumNames("ArticleType", {
-    1: "Physical good",
-    2: "Digital good",
-    3: "Subscription",
-    4: "Service",
-})
+config.globals.defineEnumNames("ArticleType", new Map([
+    [1, "Physical good"],
+    [2, "Digital good"],
+    [3, "Subscription"],
+    [4, "Service"],
+]));
 
 console.log(controllerEndpoints);
 

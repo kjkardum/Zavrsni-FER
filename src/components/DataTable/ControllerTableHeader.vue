@@ -3,6 +3,7 @@ import type {ControllerEndpointType} from "@/parser/openapiParser";
 import type {Ref} from "vue";
 import {ref, toRef, watch} from "vue";
 import {tr} from "vuetify/locale";
+import {currentRouter} from "@/parser/openapiRouter";
 
 const props = defineProps<{
     controller: ControllerEndpointType
@@ -15,7 +16,12 @@ watch(dialogDelete, (value) => {
 })
 const closeDialogDelete = () => props.setDialogDelete(false);
 const closeDialogAndDelete = () => props.setDialogDelete(false, true)
+const newItem = () => {
+  currentRouter.router?.push({
+    name: props.controller.name + '-new',
+  });
 
+}
 </script>
 
 <template>
@@ -23,6 +29,13 @@ const closeDialogAndDelete = () => props.setDialogDelete(false, true)
             flat
     >
         <v-toolbar-title>Controller {{ props.controller.name }}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn
+            color="blue darken-1"
+            @click="newItem"
+        >
+            New
+        </v-btn>
         <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
                 <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>

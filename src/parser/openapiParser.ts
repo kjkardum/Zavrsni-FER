@@ -62,14 +62,13 @@ const globalOnlyConfig = () => {
             authType: 'None' as ('Bearer' | 'Basic' | 'None'),
             onLogout: () => undefined,
         },
-        enumMapping: {},
-        defineEnumNames: (enumName: EnumKeys<typeof openapiSpecification.components.schemas>, namesMap: {
-            [key: string | number]: string
-        }) => {
+        enumMapping: {} as { [key in EnumKeys<typeof openapiSpecification.components.schemas>]?: Map<string | number, string> },
+        defineEnumNames: (enumName: EnumKeys<typeof openapiSpecification.components.schemas>, namesMap: Map<string | number, string>
+        ) => {
             const model = openapiSpecification.components.schemas[enumName];
             if (!model["enum"]) throw new Error(`Model ${enumName} is not an enum`);
             const enumValues = model["enum"].map(t => t.toString());
-            const namesMapKeys = Object.keys(namesMap);
+            const namesMapKeys = Array.from(namesMap.keys()).map(t => t.toString());
             if (namesMapKeys.length !== enumValues.length) throw new Error(`Names map for enum ${enumName} does not have the same number of values as the enum`);
             if (!namesMapKeys.every(key => enumValues.includes(key))) throw new Error(`Names map for enum ${enumName} does not have the same values as the enum, missing ${enumValues.filter(v => !namesMapKeys.includes(v))}`);
             g_config.enumMapping[enumName] = namesMap;
@@ -101,6 +100,8 @@ const globalOverrideableConfig = (setUndefined = false) => ({
 const controllerOnlyConfig = () => ({
     overrideName: undefined,
     overrideTitleCaseName: undefined,
+    representation: (item: any) => JSON.stringify(item),
+    controllersForValues: {} as { [key: string]: {name: string, filter?: (item: any) => boolean } },
     overrideActions: {
         get: undefined,
         getById: undefined,

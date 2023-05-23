@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
 import {config} from "@/parser/openapiParser";
 </script>
 
@@ -7,6 +6,5 @@ import {config} from "@/parser/openapiParser";
   <main>
       <h2>Config stuff...</h2>
       <pre>{{ config }}</pre>
-    <TheWelcome />
   </main>
 </template>
