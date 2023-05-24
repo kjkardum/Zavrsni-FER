@@ -106,7 +106,7 @@ const submit = async () => {
       const token = config.globals.authentication.loginResponseToken(data);
       localStorage.setItem('token', token);
       try {
-        const jwt_decoded = jwt.decode(token);
+        const jwt_decoded = jwt.decode(token) as any;
 
         if (jwt_decoded.email) {
           localStorage.setItem('identifier', jwt_decoded.email);

@@ -25,6 +25,45 @@ const fields = computed(() => {
   console.log('form', JSON.stringify(_fields, null, 2));
   return _fields;
 })
+
+const fieldValidators= computed(() => {
+  const _fieldValidators: any = {};
+  fields.value.forEach(field => {
+    _fieldValidators[field.name] = {
+      regex: field.pattern,
+      format: field.format,
+      minLength: field.minLength,
+      maxLength: field.maxLength,
+      required: field.required
+    };
+  });
+  return _fieldValidators;
+});
+const vueFormRules = (field) => {
+  const rules: any[] = [];
+  if (fieldValidators.value[field.name].required) {
+    rules.push((v) => !!v || `${field.name} is required`);
+  }
+  if (fieldValidators.value[field.name].minLength) {
+    rules.push((v) => (v && v.length >= fieldValidators.value[field.name].minLength) || `${field.name} must be at least ${fieldValidators.value[field.name].minLength} characters`);
+  }
+  if (fieldValidators.value[field.name].maxLength) {
+    rules.push((v) => (v && v.length <= fieldValidators.value[field.name].maxLength) || `${field.name} must be at most ${fieldValidators.value[field.name].maxLength} characters`);
+  }
+  if (fieldValidators.value[field.name].regex) {
+    rules.push((v) => (v && new RegExp(fieldValidators.value[field.name].regex).test(v)) || `${field.name} must match ${fieldValidators.value[field.name].regex}`);
+  }
+  if (fieldValidators.value[field.name].format === 'email') {
+    rules.push((v) => (v && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v)) || `${field.name} must be valid email`);
+  }
+  return rules;
+}
+const rules = ref({});
+fields.value.forEach(field => {
+  rules.value[field.name] = vueFormRules(field);
+});
+
+
 const getEnumValues = (field) => {
   if (field["ref"] && config.globals.enumMapping[field["ref"]]) {
     const res = Array.from(config.globals.enumMapping[field["ref"]], ([key, value]) => ({
@@ -154,6 +193,7 @@ watch(fieldValues, (newVal) => {
           :type="field.type"
           :label="sentenceCase(field.name)"
           :model-value="fieldValues[field.name]"
+          :rules="rules[field.name]"
           @update:model-value="fieldValues[field.name] = field.type === 'number' ? Number($event) : $event"
         />
         <v-select

@@ -91,7 +91,7 @@ const createOpenapiRouter = () => {
     currentRouter.router.beforeEach((to, from, next) => {
         const token = localStorage.getItem('token');
         if (token) {
-            const decoded = jwt.decode(token);
+            const decoded = jwt.decode(token) as any;
             if (decoded) {
                 const exp = decoded.exp;
                 const now = new Date().getTime() / 1000;

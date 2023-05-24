@@ -1247,15 +1247,19 @@ export default {
         "additionalProperties": false
       },
       "ArticleInputDto": {
+        "required": [
+          "description",
+          "title"
+        ],
         "type": "object",
         "properties": {
           "title": {
-            "type": "string",
-            "nullable": true
+            "minLength": 3,
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "price": {
             "type": "number",
