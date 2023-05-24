@@ -1129,7 +1129,9 @@ export default {
             "format": "double"
           },
           "active": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Is active?",
+            "example": true
           },
           "categoryId": {
             "type": "string",
@@ -1303,9 +1305,6 @@ export default {
         },
         "additionalProperties": false
       },
-      "OtherType": {
-        "enum": []
-      },
       "ArticleType": {
         "enum": [
           1,
@@ -1314,6 +1313,7 @@ export default {
           4
         ],
         "type": "integer",
+        "description": "Article type",
         "format": "int32"
       },
       "LoginDto": {
@@ -1321,10 +1321,13 @@ export default {
         "properties": {
           "email": {
             "type": "string",
+            "format": "email",
             "nullable": true
           },
           "password": {
+            "minLength": 8,
             "type": "string",
+            "format": "password",
             "nullable": true
           }
         },

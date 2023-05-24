@@ -8,7 +8,6 @@ import {sentenceCase} from "sentence-case";
 
 const props = defineProps<{
     controllerName: string,
-    controllerPath: string,
     dialogDelete: boolean
     setDialogDelete: (value: boolean, toDelete?: boolean) => void,
     parentId: string,

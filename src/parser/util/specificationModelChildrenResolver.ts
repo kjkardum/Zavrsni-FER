@@ -15,6 +15,11 @@ export const getSpecificationModelChildren = (specificationItem: any, levels = 2
             if (specificationItem.properties[key]["$ref"]) {
                 additionalData['ref'] = specificationItem.properties[key]["$ref"].split('/').pop();
             }
+            if (specificationItem.properties[key].minLength) additionalData['minLength'] = specificationItem.properties[key].minLength;
+            if (specificationItem.properties[key].maxLength) additionalData['maxLength'] = specificationItem.properties[key].maxLength;
+            if (specificationItem.properties[key].pattern) additionalData['pattern'] = specificationItem.properties[key].pattern;
+            if (specificationItem.properties[key].format) additionalData['format'] = specificationItem.properties[key].format;
+            if (specificationItem.properties[key].required) additionalData['required'] = specificationItem.properties[key].required;
             return {
                 name: key,
                 type: specificationItem.properties[key].type,

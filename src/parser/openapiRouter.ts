@@ -1,7 +1,8 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import type {Router, RouteRecordRaw} from "vue-router";
 import controllerEndpoints from "@/parser/openapiParser";
-
+import * as jwt from 'jsonwebtoken';
+// @ts-ignore
 export const currentRouter: {router: Router} = {router: undefined};
 const createOpenapiRouter = () => {
     currentRouter.router = createRouter({
@@ -19,6 +20,11 @@ const createOpenapiRouter = () => {
                 // this generates a separate chunk (About.[hash].js) for this route
                 // which is lazy-loaded when the route is visited.
                 component: () => import('../views/AboutView.vue')
+            },
+            {
+                path: '/login',
+                name: 'login',
+                component: () => import('../views/LoginView.vue')
             },
             ...controllerEndpoints.map(controller => ([
                 {
@@ -82,8 +88,27 @@ const createOpenapiRouter = () => {
             }
         ]
     });
-    console.log(currentRouter.router.getRoutes());
+    currentRouter.router.beforeEach((to, from, next) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwt.decode(token);
+            if (decoded) {
+                const exp = decoded.exp;
+                const now = new Date().getTime() / 1000;
+                if (exp > now) {
+                    next();
+                    return;
+                }
+            }
+        }
+        if (to.name === 'login') {
+            next();
+            return;
+        }
+        next({name: 'login'});
+    });
     return currentRouter.router;
 };
+
 
 export default createOpenapiRouter;

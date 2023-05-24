@@ -18,8 +18,8 @@ const props = defineProps<{
 }>();
 
 const controllerName = computed(() => props.controllerPrefix + props.controller.name);
-const controllerGet = computed(() => props.parentId ? props.controller.get.replace(new RegExp(`\\{${idPattern}\\}`), String(props.parentId)) : props.controller.get);
-const controllerDelete = computed(() => props.parentId ? props.controller.delete.replace(new RegExp(`\\{${idPattern}\\}`), String(props.parentId)) : props.controller.delete);
+const controllerGet = computed(() => props.parentId ? props.controller.get?.replace(new RegExp(`\\{${idPattern}\\}`), String(props.parentId)) : props.controller.get);
+const controllerDelete = computed(() => props.parentId ? props.controller.delete?.replace(new RegExp(`\\{${idPattern}\\}`), String(props.parentId)) : props.controller.delete);
 
 const configGetter = computed(() => loadControllerConfig(controllerName.value));
 const useClientPagination = computed(() => configGetter.value(t => t.pagination.source) === 'client');
@@ -44,6 +44,7 @@ const init_data = async () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
                 },
             });
         const data = await res.json();
@@ -86,6 +87,7 @@ const loadServerData = async ({page, itemsPerPage, sortBy}: { page: number, item
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token'),
             },
         });
     const data = await res.json();
@@ -139,12 +141,13 @@ const setDialogDelete = (value: boolean, toDelete = false) => {
     if (toDelete && dialogDeleteItem.value) {
         loading.value = true;
         fetch(
-            config.globals.baseUrl + controllerDelete.value.replace(new RegExp(`\\{${idPattern}\\}`), dialogDeleteItem.value.id),
+            config.globals.baseUrl + controllerDelete.value!.replace(new RegExp(`\\{${idPattern}\\}`), dialogDeleteItem.value.id),
             {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
                 },
             }).then(() => {
             loading.value = false;
@@ -208,7 +211,7 @@ watch(fields, async () => {
                 @update:options="loadServerData"
         >
           <template v-slot:top>
-            <ControllerTableHeader :controllerName="controllerName" :parent-id="parentId" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
+            <ControllerTableHeader :controllerName="controllerName" :parent-id="parentId ?? ''" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
           </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon small class="mr-2" @click="editItem(item.raw)" v-if="props.controller.put">mdi-pencil</v-icon>
@@ -226,7 +229,7 @@ watch(fields, async () => {
                 class="elevation-1"
         >
             <template v-slot:top>
-                <ControllerTableHeader :controllerName="controllerName" :parent-id="parentId" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
+                <ControllerTableHeader :controllerName="controllerName" :parent-id="parentId ?? ''" :dialog-delete="dialogDelete" :set-dialog-delete="setDialogDelete"/>
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon small class="mr-2" @click="editItem(item.raw)" v-if="props.controller.put">mdi-pencil</v-icon>

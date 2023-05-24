@@ -57,7 +57,7 @@ const globalOnlyConfig = () => {
     const g_config = {
         baseUrl: '',
         authentication: {
-            loginRoute: undefined,
+            loginRoute: undefined as (string|undefined),
             loginResponseToken: (apiResponse: any): string => "",
             authType: 'None' as ('Bearer' | 'Basic' | 'None'),
             onLogout: () => undefined,

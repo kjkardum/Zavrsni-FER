@@ -53,7 +53,7 @@ const getRelatedEntityValues = (field) => {
   if (!controllerForFieldKey) return [];
   const {name: controllerForField, filter: controllerForFieldFilter} = config.controllers[controllerName.value].controllersForValues[controllerForFieldKey];
   relatedValueFilters.value[field.name] = controllerForFieldFilter ?? ((x) => x);
-  const controllerMetadata = controllerEndpoints.find(controller => controller.name === controllerForField);
+  const controllerMetadata = controllerEndpoints.find(controller => controller.name === controllerForField)!;
   const controllerConfigGetter = loadControllerConfig(controllerForField);
   const paginationSource = controllerConfigGetter(t => t.pagination.source);
   console.log(controllerForFieldKey, controllerForField, paginationSource, controllerMetadata);
@@ -63,7 +63,8 @@ const getRelatedEntityValues = (field) => {
     fetch(config.globals.baseUrl + controllerMetadata.get, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
     }).then(res => res.json()).then(data => {
       //const mappedData = controllerConfigGetter(t => t.pagination.paginationResponse(data));
@@ -87,7 +88,8 @@ const getRelatedEntityValues = (field) => {
     ), {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
     }).then(res => res.json()).then(data => {
       const mappedData = controllerConfigGetter(t => t.pagination.paginationResponse(data));
@@ -117,12 +119,13 @@ const getRelatedEntityValues = (field) => {
 const endIntersectField = (field) => () => getRelatedEntityValues(field);
 
 watch(() => [props.editId, props.parentId], () => {
-  if (props.editId) {
+  if (props.editId && props.controller.getById) {
     console.log("fetching", props.editId);
     fetch(config.globals.baseUrl + props.controller.getById.replace(new RegExp(`\\{${idPattern}\\}`), String(props.editId)), {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
     }).then(res => res.json()).then(data => {
       fieldValues.value = data;

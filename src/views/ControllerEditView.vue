@@ -18,9 +18,9 @@ const controllerPrefix = computed(() => {
   return props.parentController ? props.parentController.name + '/' : '';
 });
 
-const editId = computed(() => route.params.id);
+const editId = computed(() => route.params.id as string);
 const parentId = computed(() => {
-  return props.parentController ? route.params['parentId'] : undefined;
+  return props.parentController ? route.params['parentId'] as string : undefined;
 });
 
 
@@ -33,13 +33,15 @@ const fields = ref({});
 
 const save = () => {
   const fetchMethod = editId.value ? 'put' : 'post';
-  const fetchUrlWithMethod = parentId.value ? props.controller[fetchMethod].replace(new RegExp(`\\{${idPattern}\\}`), String(parentId.value)) : props.controller[fetchMethod];
-  const fetchUrl = editId.value ? fetchUrlWithMethod.replace(new RegExp(`\\{${idPattern}\\}`), String(editId.value)) : fetchUrlWithMethod;
+  const fetchUrlWithMethod = parentId.value ? props.controller[fetchMethod]?.replace(new RegExp(`\\{${idPattern}\\}`), String(parentId.value)) : props.controller[fetchMethod];
+  const fetchUrl = editId.value ? fetchUrlWithMethod?.replace(new RegExp(`\\{${idPattern}\\}`), String(editId.value)) : fetchUrlWithMethod;
   console.log(fetchMethod, fetchUrl, fields.value);
+  if (!fetchUrl) throw new Error('missing fetch url');
   fetch(config.globals.baseUrl + fetchUrl, {
     method: fetchMethod.toUpperCase(),
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + localStorage.getItem('token'),
     },
     body: JSON.stringify(fields.value)
   }).then(() => {
@@ -71,7 +73,7 @@ const save = () => {
   <v-card
     v-for="controllerMetadata in props.controller.relatedEntities"
   >
-    <controller-data-table :controller="controllerMetadata" :parent-id="editId" :controller-prefix="controllerPrefix + props.controller.name + '/'" />
+    <controller-data-table :controller="controllerMetadata as any" :parent-id="editId" :controller-prefix="controllerPrefix + props.controller.name + '/'" />
   </v-card>
 </template>
 

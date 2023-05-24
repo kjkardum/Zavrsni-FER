@@ -15,7 +15,7 @@ const controllerPrefix = computed(() => {
 
 const route = useRoute();
 const parentId = computed(() => {
-    return props.parentController ? route.params['parentId'] : undefined;
+    return props.parentController ? route.params['parentId'] as string : undefined;
 });
 
 </script>

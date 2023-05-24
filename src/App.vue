@@ -1,22 +1,30 @@
 <script setup lang="ts">
 import {RouterView, useRoute} from 'vue-router'
+import {currentRouter} from "@/parser/openapiRouter";
+import {computed} from "vue";
 
 const route = useRoute();
+
+const logout = () => {
+    localStorage.removeItem('token');
+    currentRouter.router.push('login');
+}
+
+const identifier = computed(() => {
+    return localStorage.getItem('identifier') || '';
+});
 </script>
 
 <template>
     <v-app id="inspire">
         <v-system-bar>
             <v-spacer></v-spacer>
-
             <v-icon>mdi-square</v-icon>
-
             <v-icon>mdi-circle</v-icon>
-
             <v-icon>mdi-triangle</v-icon>
         </v-system-bar>
 
-        <v-navigation-drawer v-model="drawer">
+        <v-navigation-drawer v-model="drawer" :style="{display: route.path === '/login' ? 'none' : 'block'}">
             <v-sheet
                     color="grey-lighten-4"
                     class="pa-4"
@@ -25,9 +33,8 @@ const route = useRoute();
                         class="mb-4"
                         color="grey-darken-1"
                         size="64"
-                >K</v-avatar>
-
-                <div>kjkardum@gmail.com</div>
+                >{{ identifier[0].toUpperCase() }}</v-avatar>
+                <div>{{ identifier }}</div>
             </v-sheet>
 
             <v-divider></v-divider>
@@ -46,6 +53,14 @@ const route = useRoute();
 
                     <v-list-item-title>{{ text }}</v-list-item-title>
                 </v-list-item>
+              <v-list-item
+                @click="logout"
+              >
+                <template v-slot:prepend>
+                  <v-icon>mdi-logout</v-icon>
+                </template>
+                <v-list-item-title>Logout</v-list-item-title>
+              </v-list-item>
             </v-list>
         </v-navigation-drawer>
 
@@ -55,42 +70,6 @@ const route = useRoute();
                     fluid
             >
                 <RouterView/>
-
-<!--              <v-row>
-                    <v-col
-                            v-for="card in cards"
-                            :key="card"
-                            cols="12"
-                    >
-                        <v-card>
-
-                            <v-list lines="two">
-                                <v-list-subheader>{{ card }}</v-list-subheader>
-                                <template v-for="n in 6" :key="n">
-                                    <v-list-item>
-                                        <template v-slot:prepend>
-                                            <v-avatar color="grey-darken-1"></v-avatar>
-                                        </template>
-
-                                        <v-list-item-title>Message {{ n }}</v-list-item-title>
-
-                                        <v-list-item-subtitle>
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil repellendus
-                                            distinctio similique
-                                        </v-list-item-subtitle>
-                                    </v-list-item>
-
-                                    <v-divider
-                                            v-if="n !== 6"
-                                            :key="`divider-${n}`"
-                                            inset
-                                    ></v-divider>
-                                </template>
-                            </v-list>
-                        </v-card>
-                    </v-col>
-                </v-row>-->
-
             </v-container>
         </v-main>
     </v-app>
