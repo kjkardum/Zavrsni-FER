@@ -99,7 +99,8 @@ const loadServerData = async ({page, itemsPerPage, sortBy}: { page: number, item
         const newItem = {};
         for (const key in item) {
             const field = fields.value.find(field => field.name === key);
-            if (field["ref"] && config.globals.enumMapping[field["ref"]]) {
+            if (!field) continue;
+          if (field["ref"] && config.globals.enumMapping[field["ref"]]) {
                 newItem[key] = config.globals.enumMapping[field["ref"]][item[key]];
             } else {
                 newItem[key] = item[key].toString();

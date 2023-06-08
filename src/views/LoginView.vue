@@ -1,34 +1,5 @@
 <script setup lang="ts">
 import * as jwt from 'jsonwebtoken';
-/*
-new Vue({
-    el: '#app',
-    data () {
-      return {
-        valid: false,
-        e1: false,
-        password: '',
-        passwordRules: [
-          (v) => !!v || 'Password is required',
-        ],
-        email: '',
-        emailRules: [
-          (v) => !!v || 'E-mail is required',
-          (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-        ],
-      }
-    },
-    methods: {
-      submit () {
-        if (this.$refs.form.validate()) {
-          this.$refs.form.$el.submit()
-        }
-      },
-      clear () {
-        this.$refs.form.reset()
-      }
-    },
-})*/
 
 import {ref, watch} from "vue";
 import openapiSpecification from "@/assets/openapiSpecification";

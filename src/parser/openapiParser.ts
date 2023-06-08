@@ -4,9 +4,18 @@ import {sentenceCase} from "sentence-case";
 export const idPattern = `([A-Za-z]*[iI]d)`
 const paths = Object.keys(openapiSpecification.paths);
 const commonPrefix = paths.reduce((prefix, path) => {
-    const i = path.indexOf(prefix);
-    return i === 0 ? prefix : prefix.slice(0, i);
+    let commonPrefix = "";
+    for (let i = 0; i < Math.min(prefix.length, path.length); i++) {
+        if (prefix[i] === path[i]) {
+            commonPrefix += prefix[i];
+        } else {
+            break;
+        }
+    }
+    return commonPrefix;
 }, paths[0]);
+
+console.log(commonPrefix)
 
 let controllers = paths.map(path => path.slice(commonPrefix.length).split("/")[0]);
 controllers = controllers.filter((value, index, self) => self.indexOf(value) === index);
